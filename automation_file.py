@@ -1,6 +1,21 @@
+from pathlib import Path
+
 import pywhatkit as kit
 import pandas as pd
 import time
+
+"""
+Ensure you have downloaded the following libraries:
+
+pywhatkit
+pandas
+openpyxl
+
+if not, install using the following commands:
+pip install pywhatkit
+pip install pandas
+pip install openpyxl
+"""
 
 
 def send_whatsapp_messages(file_path):
@@ -11,6 +26,11 @@ def send_whatsapp_messages(file_path):
         file_path (str): The path to the Excel file containing phone numbers and messages.
     """
     try:
+        # Check if the file exists
+        file_path = Path(file_path)
+        if not file_path.is_file():
+            print(f"Error: The file '{file_path}' does not exist. Please provide a valid file path.")
+            return
         # Load the Excel file
         data = pd.read_excel(file_path)
 
@@ -26,10 +46,20 @@ def send_whatsapp_messages(file_path):
             print(f"Sending {message} to {phone}...")
 
             # Send the message (scheduled 1 minute from now)
-            kit.sendwhatmsg(phone_no=f"+{phone}",
-                            message=message,
-                            time_hour=time.localtime().tm_hour,
-                            time_min=(time.localtime().tm_min + 1) % 60)
+            # kit.sendwhatmsg(phone_no=f"+{phone}",
+            #                 message=message,
+            #                 time_hour=time.localtime().tm_hour,
+            #                 time_min=(time.localtime().tm_min + 1) % 60,
+            #                 wait_time=10,  # Specify wait_time explicitly
+            #                 tab_close=True,  # Close the tab after sending
+            #                 close_time=2
+            #                 )
+
+            kit.sendwhatmsg_instantly(phone_no=f"+{phone}",
+                                      message=message,
+                                      wait_time=5,
+                                      tab_close=True,
+                                      close_time=2)
 
             print(f"Message sent to {phone}")
             time.sleep(10)  # Delay to avoid overwhelming WhatsApp Web
@@ -41,11 +71,3 @@ def send_whatsapp_messages(file_path):
 # Provide the path to your Excel file here
 file_path = "../contacts.xlsx"
 send_whatsapp_messages(file_path)
-
-# phone_number = input("Enter your phone number: ")
-#
-# time_hour=time.localtime().tm_hour,
-# time_min=(time.localtime().tm_min + 1) % 60
-#
-# pywhatkit.sendwhatmsg(phone_number, "hello world!", time_hour=time.localtime().tm_hour,
-#                             time_min=(time.localtime().tm_min + 1) % 60)
